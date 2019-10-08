@@ -2,7 +2,7 @@ import express, {Application} from 'express';
 import path from 'path';
 import multer from 'multer';
 import cors from 'cors';
-import authRoute from './routes/auth';
+import {authRouter, postRouter, commentRouter} from './routes';
 
 
 export class App {
@@ -35,7 +35,9 @@ export class App {
     }
 
     private routes(): void{
-        this.app.use('/api/auth',authRoute);
+        this.app.use('/api/auth',authRouter);
+        this.app.use('/api/post',postRouter);
+        this.app.use('/api/comment',commentRouter);
     }
 
     public async listen(): Promise<void>{

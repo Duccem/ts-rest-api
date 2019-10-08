@@ -36,7 +36,7 @@ export const getComment = async (req: Request, res: Response): Promise<Response>
     }
 }
 
-export const updatePost = async (req: Request,res:Response): Promise<Response>=>{
+export const updateComment = async (req: Request,res:Response): Promise<Response>=>{
     const {id} = req.params;
     const {comment} = req.body;
     try {
