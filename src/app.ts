@@ -1,16 +1,46 @@
 import express, {Application} from 'express';
+import path from 'path';
+import multer from 'multer';
+import cors from 'cors';
 import authRoute from './routes/auth';
 
-const app:Application = express();
 
-//settings
-app.set('port',3000);
+export class App {
 
-//midlewares
-app.use(express.json());
-app.use(express.urlencoded({extended:false}));
+    private app: Application;
+    private storage:multer.StorageEngine | undefined;
+    
+    constructor(private port?: number | string){
+        this.app = express();
+        this.settings();
+        this.middlewares();
+        this.routes();
+    }
 
-//routes
-app.use('/api/auth',authRoute);
+    private settings(): void{
+        this.app.set('port', this.port || process.env.PORT || 3000);
+        this.storage = multer.diskStorage({//manejador de archivos como imagenes
+            destination: path.join(__dirname,'public/img/uploads'),
+            filename: (req,file,cb)=>{
+                cb(null,new Date().getTime()+path.extname(file.originalname));
+            }
+        });
+    }
 
-export default app;
+    private middlewares(): void{
+        this.app.use(express.json());
+        this.app.use(express.urlencoded({extended:false}));
+        this.app.use(cors());
+        this.app.use(multer({storage:this.storage}).single('image'));
+    }
+
+    private routes(): void{
+        this.app.use('/api/auth',authRoute);
+    }
+
+    public async listen(): Promise<void>{
+        await this.app.listen(this.app.get('port'));
+        console.log(`[SERVER] running on port ${this.app.get('port')}`);
+    }
+
+}
