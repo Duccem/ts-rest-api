@@ -1,6 +1,7 @@
 import {Request,Response} from 'express';
 import fs from 'fs-extra';
 import Post, {IPost} from '../models/Post';
+import Comment, {IComment} from '../models/Comment';
 
 export const getPosts = async (req: Request, res: Response): Promise<Response>=>{
     const posts = await Post.find();
@@ -31,7 +32,8 @@ export const getPost = async (req: Request, res: Response): Promise<Response> =>
     try {
         const post = await Post.findById(id);
         if(post){
-            return res.status(200).json(post);
+            const comments = await Comment.find({postId:id});
+            return res.status(200).json({post,comments});
         }else{
             return res.status(404).json({message:'Not found'});
         }
